@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-OUT="${1:?Usage: ./run3.sh <output_folder_in_hdfs>}"
+OUT="${1:?Usage: ./run.sh <output_folder_in_hdfs>}"
 REVIEW_PATH="/data/yelp/review"
 USER_PATH="/data/yelp/user"
 
 USERNAME="$(whoami)"
 TMP="/user/${USERNAME}/yelp_task3_tmp"
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 STREAMING_JAR="$(ls /usr/lib/hadoop-mapreduce/hadoop-streaming*.jar 2>/dev/null | head -1 || true)"
 if [[ -z "${STREAMING_JAR}" ]]; then
@@ -22,7 +24,7 @@ hdfs dfs -rm -r -f "$OUT" >/dev/null 2>&1 || true
 
 hadoop jar "$STREAMING_JAR" \
   -D mapreduce.job.name="yelp_task3_step1_user_stats" \
-  -files step1_mapper.py,step1_reducer.py \
+  -files "$DIR/step1_mapper.py,$DIR/step1_reducer.py" \
   -mapper "python3 step1_mapper.py" \
   -reducer "python3 step1_reducer.py" \
   -input "$REVIEW_PATH" \
@@ -32,7 +34,7 @@ hadoop jar "$STREAMING_JAR" \
 hadoop jar "$STREAMING_JAR" \
   -D mapreduce.job.name="yelp_task3_step2_top10_users" \
   -D mapreduce.job.reduces=1 \
-  -files step2_mapper.py,step2_reducer.py \
+  -files "$DIR/step2_mapper.py,$DIR/step2_reducer.py" \
   -mapper "python3 step2_mapper.py" \
   -reducer "python3 step2_reducer.py" \
   -input "$TMP" \
