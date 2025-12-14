@@ -2,9 +2,11 @@
 set -euo pipefail
 
 OUT="${1:?Usage: ./run3.sh <output_folder_in_hdfs>}"
-REVIEW="/data/yelp/review"
-USER="/data/yelp/user"
-TMP="/user/$USER/yelp_task3_tmp"
+REVIEW_PATH="/data/yelp/review"
+USER_PATH="/data/yelp/user"
+
+USERNAME="$(whoami)"
+TMP="/user/${USERNAME}/yelp_task3_tmp"
 
 STREAMING_JAR="$(ls /usr/lib/hadoop-mapreduce/hadoop-streaming*.jar 2>/dev/null | head -1 || true)"
 if [[ -z "${STREAMING_JAR}" ]]; then
@@ -23,8 +25,8 @@ hadoop jar "$STREAMING_JAR" \
   -files step1_mapper.py,step1_reducer.py \
   -mapper "python3 step1_mapper.py" \
   -reducer "python3 step1_reducer.py" \
-  -input "$REVIEW" \
-  -input "$USER" \
+  -input "$REVIEW_PATH" \
+  -input "$USER_PATH" \
   -output "$TMP"
 
 hadoop jar "$STREAMING_JAR" \
