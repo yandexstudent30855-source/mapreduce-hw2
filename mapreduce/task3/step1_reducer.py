@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-import sys, heapq
-
-def flush(uid, heap5, friends_cnt):
-    print(f"{uid}\t{sum(heap5)}\t{friends_cnt}")
+import sys
 
 cur = None
-friends_cnt = 0
-heap5 = []
+usefuls = []
+friends = 0
+
+def flush(u, vals, fr):
+    vals.sort(reverse=True)
+    s = sum(vals[:5])
+    print(f"{u}\t{s}\t{fr}")
 
 for line in sys.stdin:
     line = line.rstrip("\n")
@@ -18,26 +20,21 @@ for line in sys.stdin:
         cur = uid
 
     if uid != cur:
-        flush(cur, heap5, friends_cnt)
+        flush(cur, usefuls, friends)
         cur = uid
-        friends_cnt = 0
-        heap5 = []
+        usefuls = []
+        friends = 0
 
-    if tag == "U":
+    if tag == "R":
         try:
-            friends_cnt = int(val)
+            usefuls.append(int(val))
         except Exception:
-            friends_cnt = 0
-    elif tag == "R":
+            usefuls.append(0)
+    elif tag == "U":
         try:
-            useful = int(val)
+            friends = int(val)
         except Exception:
-            useful = 0
-        if len(heap5) < 5:
-            heapq.heappush(heap5, useful)
-        else:
-            if useful > heap5[0]:
-                heapq.heapreplace(heap5, useful)
+            friends = 0
 
 if cur is not None:
-    flush(cur, heap5, friends_cnt)
+    flush(cur, usefuls, friends)
