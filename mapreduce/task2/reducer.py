@@ -1,24 +1,19 @@
 #!/usr/bin/env python3
 import sys
 
-rows = []
+arr = []
 for line in sys.stdin:
-    line = line.strip()
+    line = line.rstrip("\n")
     if not line:
         continue
-    bid, h = line.split("\t", 1)
+    bid, m = line.split("\t", 1)
     try:
-        hours = float(h)
+        m = int(float(m))
     except Exception:
-        continue
-    rows.append((hours, bid))
+        m = 0
+    arr.append((bid, m))
 
-# hours desc, business_id asc
-rows.sort(key=lambda x: (-x[0], x[1]))
+arr.sort(key=lambda x: (-x[1], x[0]))
 
-for hours, bid in rows[:10]:
-    if abs(hours - round(hours)) < 1e-9:
-        out_h = str(int(round(hours)))
-    else:
-        out_h = f"{hours:.2f}".rstrip("0").rstrip(".")
-    print(f"{bid}\t{out_h}")
+for bid, m in arr[:10]:
+    print(f"{bid}\t{m}")
