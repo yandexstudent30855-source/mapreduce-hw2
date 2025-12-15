@@ -10,25 +10,21 @@ for line in sys.stdin:
     except Exception:
         continue
 
-    # review record
-    if "review_id" in obj and "user_id" in obj and "useful" in obj:
-        uid = obj.get("user_id")
+    uid = obj.get("user_id")
+    if not uid:
+        continue
+
+    if "review_id" in obj:
+        useful = obj.get("useful", 0)
         try:
-            useful = int(obj.get("useful", 0))
+            useful = int(useful)
         except Exception:
             useful = 0
         print(f"{uid}\tR\t{useful}")
-        continue
-
-    # user record
-    if "user_id" in obj and "friends" in obj:
-        uid = obj.get("user_id")
+    else:
         friends = obj.get("friends") or ""
-        cnt = 0
-        if isinstance(friends, str):
-            friends = friends.strip()
-            if friends and friends != "None":
-                cnt = len([x for x in friends.split(",") if x.strip()])
-        elif isinstance(friends, list):
-            cnt = len(friends)
+        if friends == "None" or friends.strip() == "":
+            cnt = 0
+        else:
+            cnt = len([x for x in friends.split(",") if x.strip()])
         print(f"{uid}\tU\t{cnt}")
